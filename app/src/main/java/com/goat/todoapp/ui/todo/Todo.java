@@ -1,6 +1,7 @@
 package com.goat.todoapp.ui.todo;
+import java.io.Serializable;
 
-public class Todo {
+public class Todo extends TaskItem implements Serializable{
     private String title;
     private String description;
     private String date;
@@ -29,5 +30,10 @@ public class Todo {
     public String getDate() { return date; }
     public String getTime() { return time; }
     public String getImageUri() { return imageUri; }
+    @Override
+    public int getViewType() {
+        return TaskItem.TYPE_TODO; // Memberi tahu adapter bahwa ini adalah tipe Timer
+    }
+
 }
 

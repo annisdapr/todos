@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_nav_todo_fragment_to_addTodoFragment"
             app:destination="@id/addTodoFragment" />
+        <action
+            android:id="@+id/action_nav_todo_fragment_to_addTimerFragment"
+            app:destination="@id/addTimerFragment" />
     </fragment>
 
     <fragment
@@ -30,6 +33,23 @@
     <fragment
         android:id="@+id/addTodoFragment"
         android:name="com.goat.todoapp.ui.todo.AddTodoFragment"
-        android:label="Add Todo" />
+        android:label="Detail Tugas" >
+        <argument
+            android:name="todoItem"
+            app:argType="com.goat.todoapp.ui.todo.Todo"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addTimerFragment"
+        android:name="com.goat.todoapp.ui.todo.AddTimerFragment"
+        android:label="Add Timer" >
+        <argument
+            android:name="timerTask"
+            app:argType="com.goat.todoapp.ui.todo.TimerTask"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
 
 </navigation>

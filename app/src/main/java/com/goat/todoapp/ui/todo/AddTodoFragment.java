@@ -18,7 +18,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide; // PASTIKAN IMPORT INI ADA
 import com.goat.todoapp.R;
 
 import java.text.SimpleDateFormat;
@@ -36,12 +38,15 @@ public class AddTodoFragment extends Fragment {
     private Uri imageUri = null;
 
     private final Calendar calendar = Calendar.getInstance();
+    private TodoViewModel viewModel;
+    private Todo currentTodo; // Untuk menyimpan data Todo yang dikirim
 
     private final ActivityResultLauncher<String> pickImageLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
                     imageUri = uri;
                     imgPreview.setImageURI(uri);
+                    imgPreview.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -52,6 +57,7 @@ public class AddTodoFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_todo, container, false);
 
+        // --- Inisialisasi semua view ---
         etTitle = view.findViewById(R.id.etTitle);
         etDescription = view.findViewById(R.id.etDescription);
         btnPickDate = view.findViewById(R.id.btnPickDate);
@@ -60,7 +66,57 @@ public class AddTodoFragment extends Fragment {
         btnSave = view.findViewById(R.id.btnSave);
         imgPreview = view.findViewById(R.id.imgPreview);
 
-        // pilih tanggal
+        viewModel = new ViewModelProvider(requireActivity()).get(TodoViewModel.class);
+
+        // --- Logika untuk membedakan mode "Tambah" atau "Detail" ---
+        if (getArguments() != null && getArguments().containsKey("todoItem")) {
+            currentTodo = (Todo) getArguments().getSerializable("todoItem");
+            setupDetailMode();
+        } else {
+            currentTodo = null;
+            setupAddMode();
+        }
+
+        return view;
+    }
+
+    // Method ini berjalan jika fragment dibuka untuk MELIHAT DETAIL
+    private void setupDetailMode() {
+        etTitle.setText(currentTodo.getTitle());
+        etDescription.setText(currentTodo.getDescription());
+
+        // Tampilkan tanggal dan waktu jika ada
+        if (currentTodo.getDate() != null && !currentTodo.getDate().isEmpty()) {
+            btnPickDate.setText(currentTodo.getDate());
+        }
+        if (currentTodo.getTime() != null && !currentTodo.getTime().isEmpty()) {
+            btnPickTime.setText(currentTodo.getTime());
+        }
+
+        // Tampilkan gambar jika ada
+        if (currentTodo.getImageUri() != null && !currentTodo.getImageUri().isEmpty()) {
+            imgPreview.setVisibility(View.VISIBLE);
+            Glide.with(this).load(Uri.parse(currentTodo.getImageUri())).into(imgPreview);
+        } else {
+            imgPreview.setVisibility(View.GONE);
+        }
+
+        // Matikan interaksi (mode read-only)
+        etTitle.setEnabled(false);
+        etDescription.setEnabled(false);
+        btnPickDate.setEnabled(false);
+        btnPickTime.setEnabled(false);
+        btnPickImage.setVisibility(View.GONE);
+        btnSave.setText("Edit"); // Ganti teks tombol Save menjadi Edit (opsional)
+
+        // Nanti kita bisa tambahkan logika untuk mode edit di sini
+        btnSave.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Fitur edit belum diimplementasikan", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    // Method ini berjalan jika fragment dibuka untuk MENAMBAH TUGAS BARU
+    private void setupAddMode() {
         btnPickDate.setOnClickListener(v -> {
             new DatePickerDialog(
                     requireContext(),
@@ -76,7 +132,6 @@ public class AddTodoFragment extends Fragment {
             ).show();
         });
 
-        // pilih waktu
         btnPickTime.setOnClickListener(v -> {
             new TimePickerDialog(
                     requireContext(),
@@ -92,37 +147,22 @@ public class AddTodoFragment extends Fragment {
             ).show();
         });
 
-        // pilih gambar
         btnPickImage.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
 
-        // tombol simpan
         btnSave.setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             String desc = etDescription.getText().toString().trim();
 
             if (title.isEmpty()) {
-                Toast.makeText(requireContext(), "Title cannot be empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Judul tidak boleh kosong", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Todo newTodo = new Todo(
-                    title,
-                    desc,
-                    selectedDate,
-                    selectedTime,
-                    imageUri != null ? imageUri.toString() : null
-            );
-
-            // Gunakan ViewModel
-            TodoViewModel viewModel = new ViewModelProvider(requireActivity()).get(TodoViewModel.class);
+            Todo newTodo = new Todo(title, desc, selectedDate, selectedTime, imageUri != null ? imageUri.toString() : null, false);
             viewModel.addTodo(newTodo);
 
-            Toast.makeText(requireContext(), "Todo saved!", Toast.LENGTH_SHORT).show();
-
-            requireActivity().getSupportFragmentManager().popBackStack();
+            Toast.makeText(requireContext(), "Tugas disimpan!", Toast.LENGTH_SHORT).show();
+            Navigation.findNavController(v).popBackStack(); // Kembali ke halaman sebelumnya
         });
-
-
-        return view;
     }
 }
