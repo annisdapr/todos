@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Konten utama -->
+    <LinearLayout
+        android:id="@+id/containerTodo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvTodoTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today's Tasks"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textStyle="bold"
+            android:paddingBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerTodo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="80dp" />
+
+    </LinearLayout>
+
+    <!-- Tombol Add -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddTodo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"
+        android:contentDescription="Add Todo"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/teal_700"
+        app:tint="@android:color/white" />
+
+</RelativeLayout>

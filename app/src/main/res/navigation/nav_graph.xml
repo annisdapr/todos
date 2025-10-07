@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_todo_fragment">
+
+    <fragment
+        android:id="@+id/nav_todo_fragment"
+        android:name="com.goat.todoapp.ui.todo.TodoFragment"
+        android:label="To-Do"
+        tools:layout="@layout/fragment_todo">
+        <action
+            android:id="@+id/action_nav_todo_fragment_to_addTodoFragment"
+            app:destination="@id/addTodoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_stats_fragment"
+        android:name="com.goat.todoapp.ui.stats.StatsFragment"
+        android:label="Stats"
+        tools:layout="@layout/fragment_stats" />
+
+    <fragment
+        android:id="@+id/nav_ranking_fragment"
+        android:name="com.goat.todoapp.ui.ranking.RankingFragment"
+        android:label="Ranking"
+        tools:layout="@layout/fragment_ranking" />
+
+    <fragment
+        android:id="@+id/addTodoFragment"
+        android:name="com.goat.todoapp.ui.todo.AddTodoFragment"
+        android:label="Add Todo" />
+
+</navigation>
