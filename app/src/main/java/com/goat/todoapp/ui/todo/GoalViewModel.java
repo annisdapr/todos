@@ -15,7 +15,6 @@ public class GoalViewModel extends ViewModel {
     private final MediatorLiveData<List<GoalWithProgress>> goalsWithProgressLiveData = new MediatorLiveData<>();
 
     public GoalViewModel() {
-        // Ganti TodoRepository menjadi GoalRepository jika kamu sudah rename
         goalsSource = GoalRepository.getGoalsLiveData();
         sessionsSource = GoalRepository.getTimerTasksLiveData();
 
@@ -56,7 +55,6 @@ public class GoalViewModel extends ViewModel {
                 percentage = (int) ((totalProgressToday * 100) / goal.getDailyTargetMillis());
             }
 
-            // PERBARUI PEMANGGILAN CONSTRUCTOR
             resultList.add(new GoalWithProgress(goal, totalProgressToday, percentage, sessionCount));
         }
         goalsWithProgressLiveData.setValue(resultList);

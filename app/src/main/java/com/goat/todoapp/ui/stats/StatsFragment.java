@@ -58,14 +58,12 @@ public class StatsFragment extends Fragment {
         viewPager.setAdapter(pagerAdapter);
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {}).attach();
 
-        // Observer 1: Untuk Pager/Carousel (sudah benar)
         viewModel.getGoalsWithProgressLiveData().observe(getViewLifecycleOwner(), goalsWithProgress -> {
             if (goalsWithProgress != null) {
                 pagerAdapter.submitList(goalsWithProgress);
             }
         });
 
-        // Observer 2: Untuk Chart dan Rangkuman Bawah (sudah benar)
         viewModel.getTimerTasksLiveData().observe(getViewLifecycleOwner(), sessions -> {
             if (sessions != null) {
                 updateChartAndSummaries(sessions);
