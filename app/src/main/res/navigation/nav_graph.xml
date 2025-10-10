@@ -3,40 +3,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/nav_todo_fragment">
+    app:startDestination="@id/homeFragment"> <fragment
+    android:id="@+id/homeFragment"
+    android:name="com.goat.todoapp.ui.todo.HomeFragment"
+    android:label="Home"
+    tools:layout="@layout/fragment_todo">
+
+    <action
+        android:id="@+id/action_homeFragment_to_addGoalFragment"
+        app:destination="@id/addGoalFragment" />
+
+    <action
+        android:id="@+id/action_homeFragment_to_addTimerFragment"
+        app:destination="@id/addTimerFragment" />
+</fragment>
 
     <fragment
-        android:id="@+id/nav_todo_fragment"
-        android:name="com.goat.todoapp.ui.todo.TodoFragment"
-        android:label="To-Do"
-        tools:layout="@layout/fragment_todo">
-        <action
-            android:id="@+id/action_nav_todo_fragment_to_addTodoFragment"
-            app:destination="@id/addTodoFragment" />
-        <action
-            android:id="@+id/action_nav_todo_fragment_to_addTimerFragment"
-            app:destination="@id/addTimerFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/nav_stats_fragment"
+        android:id="@+id/statsFragment"
         android:name="com.goat.todoapp.ui.stats.StatsFragment"
-        android:label="Stats"
+        android:label="Statistik"
         tools:layout="@layout/fragment_stats" />
 
     <fragment
-        android:id="@+id/nav_ranking_fragment"
-        android:name="com.goat.todoapp.ui.ranking.RankingFragment"
-        android:label="Ranking"
-        tools:layout="@layout/fragment_ranking" />
-
-    <fragment
-        android:id="@+id/addTodoFragment"
-        android:name="com.goat.todoapp.ui.todo.AddTodoFragment"
-        android:label="Detail Tugas" >
+        android:id="@+id/addGoalFragment"
+        android:name="com.goat.todoapp.ui.todo.AddGoalFragment"
+        android:label="Set New Goal"
+        tools:layout="@layout/fragment_add_goal">
         <argument
-            android:name="todoItem"
-            app:argType="com.goat.todoapp.ui.todo.Todo"
+            android:name="goal"
+            app:argType="com.goat.todoapp.ui.todo.Goal"
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
@@ -44,10 +39,10 @@
     <fragment
         android:id="@+id/addTimerFragment"
         android:name="com.goat.todoapp.ui.todo.AddTimerFragment"
-        android:label="Add Timer" >
+        android:label="Focus Session" >
         <argument
-            android:name="timerTask"
-            app:argType="com.goat.todoapp.ui.todo.TimerTask"
+            android:name="goal"
+            app:argType="com.goat.todoapp.ui.todo.Goal"
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Saat tombol dicentang (checked), gunakan background yang solid -->
+    <item android:state_checked="true" android:drawable="@drawable/day_selector_background_checked" />
+    <!-- Default (tidak dicentang), gunakan background yang transparan dengan outline -->
+    <item android:drawable="@drawable/day_selector_background" />
+</selector>

@@ -4,4 +4,14 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
+
+    <!-- Style untuk Chip -->
+    <style name="Widget.App.Chip.DaySelector" parent="Widget.Material3.Chip.Filter">
+        <item name="chipCornerRadius">50dp</item>
+        <item name="chipBackgroundColor">@color/chip_day_background_selector</item>
+        <item name="android:textColor">@color/day_selector_text_color</item>
+        <item name="chipStrokeColor">@color/chip_day_stroke_selector</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+
 </resources>

@@ -24,13 +24,22 @@
     <color name="text_secondary">#757575</color>
     <color name="text_hint">#9E9E9E</color>
     <color name="white">#FFFFFF</color>
+    <color name="txt_darkblue">#1447E6</color>
+
+    
     <color name="black">#000000</color>
 
     <!-- 🧱 Background Colors -->
-    <color name="background_light">#FFFFFF</color>
+    <color name="background_light">#F2F2F2</color>
     <color name="background_dark">#121212</color>
     <color name="card_background">#FAFAFA</color>
+    <color name="bg_lightblue">#EFF6FF</color>
+    <color name="bg_orange">#FFF7ED</color>
 
+    <!-- 🧱 Border Colors -->
+    <color name="border_blue">#BEDBFF</color>
+    <color name="border_orange">#FFBB5A</color>
+    <color name="border_green">#B9F8CF</color>
     <!-- ❤️ Status Colors -->
     <color name="success">#4CAF50</color>
     <color name="warning">#FFC107</color>

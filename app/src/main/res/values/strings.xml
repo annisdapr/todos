@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">todoapp</string>
+    <string name="app_name">MyKiroku</string>
+
+    <string name="goal_name">Nama Goal</string>
 </resources>

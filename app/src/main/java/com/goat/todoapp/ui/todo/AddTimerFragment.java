@@ -1,167 +1,186 @@
 package com.goat.todoapp.ui.todo;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Spannable;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-
 import com.goat.todoapp.R;
+
+import java.util.concurrent.TimeUnit;
 
 public class AddTimerFragment extends Fragment {
 
-    private EditText etMinutes, etTaskTitle;
-    private Button btnStart, btnPauseSave;
-    private TextView tvTimer;
-    private ProgressBar progressBar;
+    private TextView tvGoalTitle, tvTimerDisplay, tvSessionCount, tvFocusTime, tvSuccessRate;
+    private ProgressBar progressBarTimer;
+    private ImageButton btnPlayPause, btnReset, btnBold, btnItalic, btnFinishSession;
+    private EditText etNotes;
 
-    private CountDownTimer countDownTimer;
-    private TodoViewModel viewModel;
+    private GoalViewModel viewModel;
+    private Goal currentGoal;
 
-    private TimerTask currentTask; // Untuk menyimpan task yang sedang aktif
+    private Handler timerHandler = new Handler(Looper.getMainLooper());
+    private boolean isTimerRunning = false;
+    private long startTime = 0L;
+    private long timeInMillis = 0L;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_timer, container, false);
 
-        // Inisialisasi View
-        etTaskTitle = view.findViewById(R.id.etTaskTitle);
-        etMinutes = view.findViewById(R.id.etMinutes);
-        btnStart = view.findViewById(R.id.btnStart);
-        btnPauseSave = view.findViewById(R.id.btnPauseSave);
-        tvTimer = view.findViewById(R.id.tvTimer);
-        progressBar = view.findViewById(R.id.progressBar);
+        initViews(view);
 
-        // Inisialisasi ViewModel
-        viewModel = new ViewModelProvider(requireActivity()).get(TodoViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(GoalViewModel.class);
 
-        // Cek apakah ini mode 'lanjutkan' atau 'baru'
-        if (getArguments() != null && getArguments().containsKey("timerTask")) {
-            currentTask = (TimerTask) getArguments().getSerializable("timerTask");
-            etTaskTitle.setText(currentTask.getTitle());
-            etMinutes.setText(String.valueOf(currentTask.getTotalDurationMillis() / 60000));
-            etTaskTitle.setEnabled(false);
-            etMinutes.setEnabled(false);
+        if (getArguments() != null && getArguments().containsKey("goal")) {
+            currentGoal = (Goal) getArguments().getSerializable("goal");
+            tvGoalTitle.setText(currentGoal.getTitle());
+
+            viewModel.getTimerTasksLiveData().observe(getViewLifecycleOwner(), sessions -> {
+                if (sessions == null) return;
+
+                long totalFocusMillis = 0;
+                int sessionCount = 0;
+
+                for(TimerTask session : sessions){
+                    if(session.getTitle().equals(currentGoal.getTitle())){
+                        totalFocusMillis += session.getTotalDurationMillis();
+                        sessionCount++;
+                    }
+                }
+
+                long hours = TimeUnit.MILLISECONDS.toHours(totalFocusMillis);
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(totalFocusMillis) % 60;
+
+                tvSessionCount.setText(String.valueOf(sessionCount));
+                tvFocusTime.setText(String.format("%dh %dm", hours, minutes));
+
+                if(currentGoal.getDailyTargetMillis() > 0){
+                    int successRate = (int) ((totalFocusMillis * 100) / currentGoal.getDailyTargetMillis());
+                    tvSuccessRate.setText(successRate + "%");
+                } else {
+                    tvSuccessRate.setText("N/A");
+                }
+            });
+
         } else {
-            currentTask = null; // Mode baru
+            tvGoalTitle.setText("General Focus");
         }
 
-        updateUI();
-
-        btnStart.setOnClickListener(v -> startOrResumeTimer());
-        btnPauseSave.setOnClickListener(v -> pauseAndSaveTimer());
+        setupListeners();
 
         return view;
     }
 
-    private void startOrResumeTimer() {
-        if (currentTask != null && currentTask.getStatus() == TimerTask.STATUS_RUNNING) return;
+    private void initViews(View view) {
+        tvGoalTitle = view.findViewById(R.id.tv_goal_title_timer);
+        tvTimerDisplay = view.findViewById(R.id.tv_timer_display);
+        progressBarTimer = view.findViewById(R.id.progress_bar_timer);
+        btnPlayPause = view.findViewById(R.id.btn_play_pause);
+        btnReset = view.findViewById(R.id.btn_reset);
+        btnFinishSession = view.findViewById(R.id.btn_finish_session);
+        etNotes = view.findViewById(R.id.et_notes);
+        btnBold = view.findViewById(R.id.btn_bold);
+        btnItalic = view.findViewById(R.id.btn_italic);
 
-        long durationToRun;
-        if (currentTask == null) { // Membuat timer baru
-            String title = etTaskTitle.getText().toString().trim();
-            String minutesStr = etMinutes.getText().toString().trim();
-            if (title.isEmpty() || minutesStr.isEmpty()) {
-                Toast.makeText(getContext(), "Judul dan menit harus diisi", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            long totalMillis = Long.parseLong(minutesStr) * 60000;
-            currentTask = new TimerTask(title, totalMillis);
-            viewModel.addTimerTask(currentTask); // Langsung simpan ke repository
-            durationToRun = totalMillis;
-        } else { // Melanjutkan timer yang ada
-            durationToRun = currentTask.getTimeLeftMillis();
-        }
-
-        currentTask.setStatus(TimerTask.STATUS_RUNNING);
-        viewModel.updateTimerTask(currentTask);
-        updateUI();
-
-        countDownTimer = new CountDownTimer(durationToRun, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                currentTask.setTimeLeftMillis(millisUntilFinished);
-                updateTimerText();
-            }
-
-            @Override
-            public void onFinish() {
-                currentTask.setTimeLeftMillis(0);
-                currentTask.setStatus(TimerTask.STATUS_FINISHED);
-                viewModel.updateTimerTask(currentTask);
-                updateUI();
-                Toast.makeText(getContext(), "Sesi '" + currentTask.getTitle() + "' selesai!", Toast.LENGTH_LONG).show();
-                Navigation.findNavController(getView()).popBackStack();
-            }
-        }.start();
+        tvSessionCount = view.findViewById(R.id.tv_session_count);
+        tvFocusTime = view.findViewById(R.id.tv_focus_time);
+        tvSuccessRate = view.findViewById(R.id.tv_success_rate);
     }
 
-    private void pauseAndSaveTimer() {
-        if (currentTask == null) { // Jika belum ada timer yg dimulai, anggap sbg save & exit
-            Navigation.findNavController(getView()).popBackStack();
-            return;
-        }
+    private void setupListeners() {
+        btnPlayPause.setOnClickListener(v -> {
+            if (isTimerRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        });
 
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
+        btnFinishSession.setOnClickListener(v -> finishSession());
 
-        currentTask.setStatus(TimerTask.STATUS_PAUSED);
-        viewModel.updateTimerTask(currentTask);
-        Toast.makeText(getContext(), "Timer disimpan", Toast.LENGTH_SHORT).show();
+        btnBold.setOnClickListener(v -> applyStyle(Typeface.BOLD));
+        btnItalic.setOnClickListener(v -> applyStyle(Typeface.ITALIC));
+    }
+
+    private Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            timeInMillis = System.currentTimeMillis() - startTime;
+            updateTimerDisplay();
+            timerHandler.postDelayed(this, 1000);
+        }
+    };
+
+    private void startTimer() {
+        startTime = System.currentTimeMillis() - timeInMillis;
+        timerHandler.postDelayed(timerRunnable, 0);
+        isTimerRunning = true;
+        btnPlayPause.setImageResource(R.drawable.ic_pause);
+        btnFinishSession.setVisibility(View.VISIBLE);
+    }
+
+    private void pauseTimer() {
+        timerHandler.removeCallbacks(timerRunnable);
+        isTimerRunning = false;
+        btnPlayPause.setImageResource(R.drawable.ic_play);
+    }
+
+    private void finishSession() {
+        pauseTimer();
+        String title = (currentGoal != null) ? currentGoal.getTitle() : "General Focus";
+
+        TimerTask completedSession = new TimerTask(title, timeInMillis);
+        completedSession.setStatus(TimerTask.STATUS_FINISHED);
+
+        viewModel.addTimerTask(completedSession);
+
+        Toast.makeText(getContext(), "Sesi '" + title + "' disimpan!", Toast.LENGTH_LONG).show();
         Navigation.findNavController(getView()).popBackStack();
     }
 
-    private void updateUI() {
-        if (currentTask == null) { // Tampilan untuk timer baru
-            btnPauseSave.setText("Pause&Save");
-            return;
+    private void updateTimerDisplay() {
+        int seconds = (int) (timeInMillis / 1000);
+        int minutes = seconds / 60;
+        seconds = seconds % 60;
+        int hours = minutes / 60;
+        minutes = minutes % 60;
+
+        tvTimerDisplay.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
+
+        if (currentGoal != null) {
+            int progress = (int) (timeInMillis * 100 / currentGoal.getDailyTargetMillis());
+            progressBarTimer.setProgress(Math.min(progress, 100));
         }
-
-        etTaskTitle.setText(currentTask.getTitle());
-        etMinutes.setText(String.valueOf(currentTask.getTotalDurationMillis() / 60000));
-        updateTimerText();
-
-        boolean isRunning = currentTask.getStatus() == TimerTask.STATUS_RUNNING;
-        btnStart.setEnabled(!isRunning);
-        etTaskTitle.setEnabled(currentTask.getStatus() != TimerTask.STATUS_FINISHED);
-        etMinutes.setEnabled(currentTask.getStatus() != TimerTask.STATUS_FINISHED);
     }
 
-    private void updateTimerText() {
-        long millis = (currentTask != null) ? currentTask.getTimeLeftMillis() : 0;
-        long totalMillis = (currentTask != null) ? currentTask.getTotalDurationMillis() : 1;
-
-        int minutes = (int) (millis / 1000) / 60;
-        int seconds = (int) (millis / 1000) % 60;
-
-        tvTimer.setText(String.format("%02d:%02d", minutes, seconds));
-        progressBar.setMax((int) (totalMillis / 1000));
-        progressBar.setProgress((int) (millis / 1000));
+    private void applyStyle(int style) {
+        int start = etNotes.getSelectionStart();
+        int end = etNotes.getSelectionEnd();
+        Spannable spannable = etNotes.getText();
+        spannable.setSpan(new StyleSpan(style), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        // Pastikan timer berhenti jika fragment ditutup paksa
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-            if(currentTask != null && currentTask.getStatus() == TimerTask.STATUS_RUNNING){
-                currentTask.setStatus(TimerTask.STATUS_PAUSED);
-                viewModel.updateTimerTask(currentTask);
-            }
+        if (isTimerRunning) {
+            pauseTimer();
         }
     }
 }

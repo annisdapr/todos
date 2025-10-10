@@ -1,0 +1,4 @@
+<resources>
+    <!-- Ukuran tinggi bottom navigation -->
+    <dimen name="design_bottom_navigation_height">70dp</dimen>
+</resources>

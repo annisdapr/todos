@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Menggabungkan dua animasi (fade dan scale) agar berjalan bersamaan -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true">
+
+    <!-- Animasi Fade In: Muncul dari transparan ke terlihat penuh -->
+<!--    <alpha-->
+<!--        android:duration="1500"-->
+<!--        android:fromAlpha="0.0"-->
+<!--        android:toAlpha="1.0"-->
+<!--        android:interpolator="@android:anim/accelerate_decelerate_interpolator"/>-->
+
+    <!-- Animasi Scale Up: Membesar dari 80% ke 100% dari tengah -->
+    <scale
+        android:duration="1500"
+        android:fromXScale="0.2"
+        android:fromYScale="0.2"
+        android:toXScale="1.0"
+        android:toYScale="1.0"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator"/>
+
+</set>

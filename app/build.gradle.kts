@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.goat.todoapp"
-        minSdk = 35
+        minSdk = 31
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -52,7 +52,8 @@ dependencies {
     implementation(libs.lifecycle.livedata)
     implementation(libs.lifecycle.viewmodel)
 
-
+    implementation(libs.mpandroidchart)
+    implementation(libs.core.splashscreen)
     implementation(libs.glide)
     annotationProcessor(libs.glide.compiler)
 }

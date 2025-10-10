@@ -6,4 +6,29 @@
     </style>
 
     <style name="Theme.Todoapp" parent="Base.Theme.Todoapp" />
+
+    <style name="Widget.App.Chip.DaySelector" parent="Widget.Material3.Chip.Filter">
+        <!-- Membuat bentuknya menjadi lingkaran sempurna -->
+        <item name="chipCornerRadius">50dp</item>
+        <!-- Mengatur warna background menggunakan selector -->
+        <item name="chipBackgroundColor">@color/chip_day_background_selector</item>
+        <item name="checkedIconVisible">false</item>
+        <!-- Mengatur warna teks menggunakan selector -->
+        <item name="android:textColor">@color/day_selector_text_color</item>
+        <!-- Mengatur warna dan lebar outline -->
+        <item name="chipStrokeColor">@color/chip_day_stroke_selector</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+    <style name="Theme.App.Transparent" parent="Theme.AppCompat.NoActionBar">
+        <!-- Bikin window transparan (efeknya: background di bawah bisa kelihatan) -->
+        <item name="android:windowIsTranslucent">true</item>
+        <!-- Warna background-nya, bisa kamu ubah jadi transparent atau warna tertentu -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- Hilangkan title bar -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- Bikin tampil fullscreen -->
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+
 </resources>
